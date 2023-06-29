@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+    <div class="container">
+        <h1>کتاب ها</h1>
+
+        <div class="accordion" id="accordionExample">
+            <div class="card">
+                <div class="card-header" id="headingOne">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
+                                data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                            افزودن کتاب
+                        </button>
+                    </h2>
+                </div>
+
+                <div id="collapseOne" class="collapse" aria-labelledby="headingOne"
+                     data-parent="#accordionExample">
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col">
+                                    <label>شابک کتاب</label>
+                                    <input required type="text" class="form-control" name="isbn" placeholder="شابک 13 رقمی را وارد کنید"
+                                    pattern="[0-9]{13}" maxlength="13">
+                                </div>
+                                <div class="col">
+                                    <label>نام کتاب</label>
+                                    <input required type="text" class="form-control" name="name" placeholder="نام کتاب را وارد کنید"
+                                    pattern="[a-zA-Z ]{3,}">
+                                </div>
+                                <div class="col">
+                                    <label>نام نویسنده</label>
+                                    <input required type="text" class="form-control" name="author" placeholder="نام نویسنده را وارد کنید"
+                                    pattern="[a-zA-Z ]{4,}">
+                                </div>
+
+                                <div class="col">
+                                    <label>نام ناشر</label>
+                                    <input required type="text" class="form-control" name="publisher"
+                                           placeholder="نام ناشر را وارد کنید">
+                                </div>
+                            </div>
+
+                            <br>
+                            <button type="submit" class="btn btn-primary">ثبت</button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header" id="headingTwo">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse"
+                                data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            جست و جو
+                        </button>
+                    </h2>
+                </div>
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                    <div class="card-body">
+                        <form method="get">
+
+                            <label>:شابک کتاب یا نام نویسنده را وارد کنید</label>
+                            <input required type="text" name="q" placeholder="شابک 13 رقمی یا نام نویسنده">
+
+                            <button type="submit" class="btn btn-primary">جست و جو</button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <br>
+        {% if messages %}
+            {% for mssg in messages %}
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    {{ mssg }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <br>
+        {% if all_books %}
+            <br>
+            <table class="table table-bordered ">
+                <thead class="table-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">نام کتاب</th>
+                    <th scope="col">شابک کتاب</th>
+                    <th scope="col">نویسنده</th>
+                    <th scope="col">ناشر</th>
+                    <th scope="col">ویرایش</th>
+
+
+                </tr>
+                </thead>
+                <tbody>
+                {% for obj in all_books %}
+
+
+                    <tr>
+
+                        <td>{{ obj.id }}</td>
+                        <td>{{ obj.name }}</td>
+                        <td>{{ obj.isbn }}</td>
+                        <td>{{ obj.author }}</td>
+                        <td>{{ obj.publisher }}e</td>
+                        <td><a href="{% url 'edit_book' obj.id %}"> ویرایش </a></td>
+
+
+                    </tr>
+
+                {% endfor %}
+                </tbody>
+            </table>
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-end">
+                    <li class="page-item"><a class="page-link" href="?pg=1"><<</a></li>
+                    {% if all_books.has_previous %}
+                        <li class="page-item"><a class="page-link"
+                                                 href="?pg={{ all_books.previous_page_number }}">{{ all_books.previous_page_number }}</a>
+                        </li>
+                    {% endif %}
+                    <li class="page-item"><a class="page-link"
+                                             href="?pg={{ all_books.number }}">{{ all_books.number }}</a></li>
+                    {% if all_books.has_next %}
+                        <li class="page-item"><a class="page-link"
+                                                 href="?pg={{ all_books.next_page_number }}">{{ all_books.next_page_number }}</a>
+                        </li>
+                    {% endif %}
+                    <li class="page-item"><a class="page-link" href="?pg={{ all_books.paginator.num_pages }}">>></a>
+                    </li>
+                </ul>
+            </nav>
+
+        {% else %}
+            <h4>!چیزی پیدا نشد</h4>
+            </div>
+        {% endif %}
+{% endblock %}
